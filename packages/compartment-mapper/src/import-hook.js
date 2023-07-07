@@ -11,6 +11,7 @@
 /** @typedef {import('./types.js').CompartmentDescriptor} CompartmentDescriptor */
 /** @typedef {import('./types.js').ImportHookMaker} ImportHookMaker */
 
+import { resolve } from './node-module-specifier.js';
 import { enforceModulePolicy } from './policy.js';
 import { unpackReadPowers } from './powers.js';
 
@@ -62,30 +63,56 @@ const nodejsConventionSearchSuffixes = [
 /**
  * @param {ReadFn|ReadPowers} readPowers
  * @param {string} baseLocation
- * @param {Sources} sources
- * @param {Record<string, CompartmentDescriptor>} compartmentDescriptors
- * @param {Record<string, any>} exitModules
- * @param {HashFn=} computeSha512
- * @param {Array<string>} searchSuffixes - Suffixes to search if the unmodified specifier is not found.
+ * @param {object} args
+ * @param {string} args.entryCompartmentName
+ * @param {string} args.entryModuleSpecifier
+ * @param {Sources} [args.sources]
+ * @param {Record<string, CompartmentDescriptor>} [args.compartments]
+ * @param {Record<string, any>} [args.exitModules]
+ * @param {HashFn} [args.computeSha512]
+ * @param {Array<string>} [args.searchSuffixes] - Suffixes to search if the
+ * unmodified specifier is not found.
  * Pass [] to emulate Node.js’s strict behavior.
  * The default handles Node.js’s CommonJS behavior.
- * Unlike Node.js, the Compartment Mapper lifts CommonJS up, more like a bundler,
- * and does not attempt to vary the behavior of resolution depending on the
- * language of the importing module.
+ * Unlike Node.js, the Compartment Mapper lifts CommonJS up, more like a
+ * bundler, and does not attempt to vary the behavior of resolution depending
+ * on the language of the importing module.
  * @returns {ImportHookMaker}
  */
 export const makeImportHookMaker = (
   readPowers,
   baseLocation,
-  sources = Object.create(null),
-  compartmentDescriptors = Object.create(null),
-  exitModules = Object.create(null),
-  computeSha512 = undefined,
-  searchSuffixes = nodejsConventionSearchSuffixes,
+  {
+    sources = Object.create(null),
+    compartments: compartmentDescriptors = Object.create(null),
+    exitModules = Object.create(null),
+    computeSha512 = undefined,
+    searchSuffixes = nodejsConventionSearchSuffixes,
+    entryCompartmentName,
+    entryModuleSpecifier,
+  },
 ) => {
-  // Set of specifiers for modules whose parser is not using heuristics to determine imports
-  const strictlyRequired = new Set();
-  // per-assembly:
+  // Set of specifiers for modules (scoped to compartment) whose parser is not
+  // using heuristics to determine imports.
+  /** @type {Map<string, Set<string>>} compartment name ->* module specifier */
+  const strictlyRequired = new Map([
+    [entryCompartmentName, new Set([entryModuleSpecifier])],
+  ]);
+
+  /**
+   * @param {string} compartmentName
+   */
+  const strictlyRequiredForCompartment = compartmentName => {
+    let compartmentStrictlyRequired = strictlyRequired.get(compartmentName);
+    if (compartmentStrictlyRequired !== undefined) {
+      return compartmentStrictlyRequired;
+    }
+    compartmentStrictlyRequired = new Set();
+    strictlyRequired.set(compartmentName, compartmentStrictlyRequired);
+    return compartmentStrictlyRequired;
+  };
+
+  // per-compartment:
   /** @type {ImportHookMaker} */
   const makeImportHook = (
     packageLocation,
@@ -114,7 +141,7 @@ export const makeImportHookMaker = (
       // defer, because importing from esm makes it strictly required.
       // Note that ultimately a situation may arise, with exit modules, where the module never reaches importHook but
       // its imports do. In that case the notion of strictly required is no longer boolean, it's true,false,noidea.
-      if (strictlyRequired.has(specifier)) {
+      if (strictlyRequiredForCompartment(packageLocation).has(specifier)) {
         throw error;
       }
       // Return a place-holder that'd throw an error if executed
@@ -268,10 +295,11 @@ export const makeImportHookMaker = (
             sha512,
           };
           if (!shouldDeferError(parser)) {
-            getImportsFromRecord(record).forEach(
-              strictlyRequired.add,
-              strictlyRequired,
-            );
+            for (const importSpecifier of getImportsFromRecord(record)) {
+              strictlyRequiredForCompartment(packageLocation).add(
+                resolve(importSpecifier, moduleSpecifier),
+              );
+            }
           }
 
           return record;

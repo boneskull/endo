@@ -326,21 +326,21 @@ const digestLocation = async (powers, moduleLocation, options) => {
 
   const {
     compartments,
-    entry: { module: entryModuleSpecifier },
+    entry: { module: entryModuleSpecifier, compartment: entryCompartmentName },
   } = compartmentMap;
 
   /** @type {Sources} */
   const sources = Object.create(null);
 
-  const makeImportHook = makeImportHookMaker(
-    read,
-    packageLocation,
+  const makeImportHook = makeImportHookMaker(read, packageLocation, {
     sources,
     compartments,
     exitModules,
     computeSha512,
     searchSuffixes,
-  );
+    entryCompartmentName,
+    entryModuleSpecifier,
+  });
   // Induce importHook to record all the necessary modules to import the given module specifier.
   const { compartment, attenuatorsCompartment } = link(compartmentMap, {
     resolve,
