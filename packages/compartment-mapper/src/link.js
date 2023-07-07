@@ -413,9 +413,6 @@ export const link = (
     compartmentDescriptors,
   );
 
-  /** @type {Record<string, ResolveHook>} */
-  const resolvers = Object.create(null);
-
   const pendingJobs = [];
 
   for (const [compartmentName, compartmentDescriptor] of entries(
@@ -451,6 +448,9 @@ export const link = (
       }
     };
 
+    // If we ever need an alternate resolution algorithm, it should be
+    // indicated in the compartment descriptor and a behavior selected here.
+    const resolveHook = resolve;
     const importHook = makeImportHook(
       location,
       name,
@@ -468,8 +468,6 @@ export const link = (
       attenuators,
       archiveOnly,
     );
-    const resolveHook = resolve;
-    resolvers[compartmentName] = resolve;
 
     const compartment = new Compartment(Object.create(null), undefined, {
       resolveHook,
@@ -507,7 +505,6 @@ export const link = (
   return {
     compartment,
     compartments,
-    resolvers,
     attenuatorsCompartment,
     pendingJobsPromise: promiseAllSettled(pendingJobs).then(
       /** @param {PromiseSettledResult<unknown>[]} results */ results => {
