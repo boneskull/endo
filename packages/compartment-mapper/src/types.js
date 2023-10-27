@@ -146,7 +146,7 @@ export {};
 /**
  * @callback ExecuteFn
  * @param {ExecuteOptions} [options]
- * @returns {Promise<object>}
+ * @returns {Promise<SomeObject>}
  */
 
 /**
@@ -498,4 +498,9 @@ export {};
  * @property {Record<string, PackagePolicy<PackagePolicyItem, GlobalsPolicyItem, BuiltinsPolicyItem>>} resources - The package policies for the resources.
  * @property {string} [defaultAttenuator] - The default attenuator.
  * @property {PackagePolicy<PackagePolicyItem, GlobalsPolicyItem, BuiltinsPolicyItem>} [entry] - The package policy for the entry.
+ */
+
+/**
+ * Any object. All objects. Not `null`, though.
+ * @typedef {Record<PropertyKey, any>} SomeObject
  */
