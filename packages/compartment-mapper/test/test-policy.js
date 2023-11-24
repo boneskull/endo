@@ -167,7 +167,7 @@ scaffold(
 );
 
 scaffold(
-  'policy - attack - browser alias',
+  'policy - attack - browser alias - with alias hint',
   test,
   fixtureAttack,
   assertTestAlwaysThrows,
@@ -175,7 +175,8 @@ scaffold(
   {
     shouldFailBeforeArchiveOperations: true,
     onError: (t, { error }) => {
-      t.regex(error.message, /dan.*alias.*hackity/);
+      t.regex(error.message, /dan.*resolves.*hackity/);
+      // see the snapshot for the error hint in the message
       t.snapshot(sanitizePaths(error.message));
     },
     addGlobals: globals,
@@ -244,6 +245,10 @@ const skipCarol = mutationEdit((policyToAlter) => {
   policyToAlter.resources['alice>carol'] = undefined;
 });
 
+const disallowCarol = mutationEdit((policyToAlter) => {
+  policyToAlter.resources.alice.packages['alice>carol'] = false;
+});
+
 const addAttenuatorForAllGlobals = recursiveEdit((key, obj) => {
   if (key === 'globals') {
     obj[key] = {
@@ -290,6 +295,27 @@ scaffold(
   {
     addGlobals: globals,
     policy: skipCarol(policy),
+  },
+);
+
+
+scaffold(
+  'policy - disallowed package with error hint',
+  test,
+  fixture,
+  assertTestAlwaysThrows,
+  2, // expected number of assertions
+  {
+    shouldFailBeforeArchiveOperations: true,
+    onError: (t, { error }) => {
+      t.regex(
+        error.message,
+        /Importing.*carol.*in.*alice.*not allowed/i,
+      );
+      t.snapshot(sanitizePaths(error.message));
+    },
+    addGlobals: globals,
+    policy: disallowCarol(policy),
   },
 );
 
