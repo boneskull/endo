@@ -2,18 +2,18 @@
 /* eslint no-shadow: "off" */
 
 import { ZipReader } from '@endo/zip';
-import { link } from './link.js';
-import parserPreCjs from './parse-pre-cjs.js';
-import parserJson from './parse-json.js';
-import parserText from './parse-text.js';
-import parserBytes from './parse-bytes.js';
-import parserPreMjs from './parse-pre-mjs.js';
-import { parseLocatedJson } from './json.js';
-import { unpackReadPowers } from './powers.js';
-import { join } from './node-module-specifier.js';
 import { assertCompartmentMap } from './compartment-map.js';
 import { exitModuleImportHookMaker } from './import-hook.js';
+import { parseLocatedJson } from './json.js';
+import { link } from './link.js';
+import { join } from './node-module-specifier.js';
+import parserBytes from './parse-bytes.js';
+import parserJson from './parse-json.js';
+import parserPreCjs from './parse-pre-cjs.js';
+import parserPreMjs from './parse-pre-mjs.js';
+import parserText from './parse-text.js';
 import { attenuateModuleHook, enforceModulePolicy } from './policy.js';
+import { unpackReadPowers } from './powers.js';
 
 const DefaultCompartment = Compartment;
 
@@ -95,7 +95,9 @@ const makeArchiveImportHookMaker = (
           // module is a "builtin" module and the policy needs to be enforced.
           enforceModulePolicy(moduleSpecifier, compartmentDescriptor, {
             exit: true,
-            errorHint: `Blocked in loading. ${q(moduleSpecifier)} was not in the archive and an attempt was made to load it as a builtin`,
+            errorHint: `Blocked in loading. ${q(
+              moduleSpecifier,
+            )} was not in the archive and an attempt was made to load it as a builtin`,
           });
           const record = await exitModuleImportHook(moduleSpecifier);
           if (record) {
@@ -106,6 +108,7 @@ const makeArchiveImportHookMaker = (
               record: await attenuateModuleHook(
                 moduleSpecifier,
                 record,
+                // @ts-expect-error bad
                 compartmentDescriptor.policy,
                 attenuators,
               ),

@@ -14,12 +14,12 @@
 /** @typedef {import('./types.js').LinkOptions} LinkOptions */
 /** @template T @typedef {import('@endo/eventual-send').ERef<T>} ERef */
 
-import { resolve as resolveFallback } from './node-module-specifier.js';
 import { parseExtension } from './extension.js';
+import { resolve as resolveFallback } from './node-module-specifier.js';
 import {
-  enforceModulePolicy,
   ATTENUATORS_COMPARTMENT,
   attenuateGlobals,
+  enforceModulePolicy,
   makeDeferredAttenuatorsProvider,
 } from './policy.js';
 
@@ -233,12 +233,12 @@ const makeModuleMapHook = (
       if (foreignModuleSpecifier !== undefined) {
         // archive goes through foreignModuleSpecifier for local modules too
         if (!moduleSpecifier.startsWith('./')) {
-
-          // This code path seems to only be reached on subsequent imports of the same specifier in the same compartment. 
+          // This code path seems to only be reached on subsequent imports of the same specifier in the same compartment.
           // The check should be redundant and is only left here out of abundance of caution.
           enforceModulePolicy(moduleSpecifier, compartmentDescriptor, {
             exit: false,
-            errorHint: 'This check should not be reachable. If you see this error, please file an issue.',
+            errorHint:
+              'This check should not be reachable. If you see this error, please file an issue.',
           });
         }
 
@@ -283,7 +283,9 @@ const makeModuleMapHook = (
 
         enforceModulePolicy(scopePrefix, compartmentDescriptor, {
           exit: false,
-          errorHint: `Blocked in linking. ${q(moduleSpecifier)} is part of the compartment map and resolves to ${q(
+          errorHint: `Blocked in linking. ${q(
+            moduleSpecifier,
+          )} is part of the compartment map and resolves to ${q(
             foreignCompartmentName,
           )}.`,
         });
@@ -420,6 +422,7 @@ export const link = (
       attenuateGlobals(
         compartment.globalThis,
         globals,
+        // @ts-expect-error can be undefined!
         compartmentDescriptor.policy,
         attenuators,
         pendingJobs,

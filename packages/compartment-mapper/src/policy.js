@@ -206,7 +206,7 @@ export const makeDeferredAttenuatorsProvider = (
     };
   } else {
     defaultAttenuator =
-      compartmentDescriptors[ATTENUATORS_COMPARTMENT].policy.defaultAttenuator;
+      compartmentDescriptors[ATTENUATORS_COMPARTMENT].policy?.defaultAttenuator;
 
     // At the time of this function being called, attenuators compartment won't
     // exist yet, we need to defer looking them up in the compartment to the
