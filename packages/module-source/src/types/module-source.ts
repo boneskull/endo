@@ -23,6 +23,29 @@ export type ModuleSourceRecord = Readonly<
 >;
 
 /**
+ * Details for a {@link SourceMapHook}.
+ *
+ * **Do not confuse with `SourceMapHookDetails` type from `@endo/compartment-mapper`.**
+ */
+export interface SourceMapHookDetails {
+  sourceUrl?: string;
+  sourceMapUrl?: string;
+  source: string;
+}
+
+/**
+ * A source map hook.
+ *
+ * **Do not confuse with `SourceMapHook` type from `@endo/compartment-mapper`.**
+ * @param sourceMap A SourceMapV3 object
+ * @param details Details
+ */
+export type SourceMapHook = (
+  sourceMap: SourceMapObject,
+  details: SourceMapHookDetails,
+) => void;
+
+/**
  * A bulging bucket of options for `transformSource`.
  */
 export interface TransformSourceParams
@@ -58,17 +81,6 @@ export type PluginFactory = (params: { types: typeof babelTypes }) => {
 };
 
 /**
- * Details for a {@link SourceMapHook}.
- *
- * **Do not confuse with `SourceMapHookDetails` type from `@endo/compartment-mapper`.**
- */
-export interface SourceMapHookDetails {
-  sourceUrl?: string;
-  sourceMapUrl?: string;
-  source: string;
-}
-
-/**
  * A SourceMapV3 object.
  */
 export type SourceMapObject = {
@@ -80,18 +92,6 @@ export type SourceMapObject = {
   mappings: string;
   file: string;
 };
-
-/**
- * A source map hook.
- *
- * **Do not confuse with `SourceMapHook` type from `@endo/compartment-mapper`.**
- * @param sourceMap A SourceMapV3 object
- * @param details Details
- */
-export type SourceMapHook = (
-  sourceMap: SourceMapObject,
-  details: SourceMapHookDetails,
-) => void;
 
 /**
  * Options for the `ModuleSource` constructor.
