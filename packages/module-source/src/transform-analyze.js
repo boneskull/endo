@@ -6,13 +6,13 @@ import * as h from './hidden.js';
 import { createSourceOptions } from './source-options.js';
 import { buildFunctorSource, buildModuleRecord } from './functor.js';
 
-/** @import {Options} from './module-source.js' */
+/** @import {ModuleSourceOptions} from './types/module-source.js' */
 
 const makeCreateStaticRecord = transformSource =>
   /**
    *
    * @param {string} moduleSource
-   * @param {Options} options
+   * @param {ModuleSourceOptions} options
    */
   function createStaticRecord(
     moduleSource,

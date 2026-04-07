@@ -12,5 +12,8 @@
   ],
   "exclude": [
     "**/*.d.ts"
-  ]
+  ],
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true
+  }
 }

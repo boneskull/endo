@@ -43,7 +43,7 @@ export const makeTransformSource = (makeModulePlugins, babel = null) => {
       options;
 
     const ast = parseBabel(source, {
-      sourceType,
+      ...(sourceType !== undefined ? { sourceType } : {}),
       tokens: true,
       createParenthesizedExpressions: true,
     });
@@ -57,7 +57,7 @@ export const makeTransformSource = (makeModulePlugins, babel = null) => {
         {
           sourceFileName: sourceMapUrl,
           sourceMaps: !!sourceMapHook,
-          // @ts-expect-error - undocumented??
+          // @ts-expect-error undocumented option
           inputSourceMap: sourceMap,
           experimental_preserveFormat: true,
           preserveFormat: true,

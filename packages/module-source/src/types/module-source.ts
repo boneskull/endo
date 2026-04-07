@@ -28,8 +28,8 @@ export type ModuleSourceRecord = Readonly<
  * **Do not confuse with `SourceMapHookDetails` type from `@endo/compartment-mapper`.**
  */
 export interface SourceMapHookDetails {
-  sourceUrl?: string;
-  sourceMapUrl?: string;
+  sourceUrl?: string | undefined;
+  sourceMapUrl?: string | undefined;
   source: string;
 }
 
@@ -43,7 +43,7 @@ export type SourceMapObject = {
   sourceRoot?: string | undefined;
   sourcesContent?: string[] | undefined;
   mappings: string;
-  file: string;
+  file?: string | undefined;
 };
 
 /**
@@ -60,11 +60,16 @@ export type SourceMapHook = (
 
 /**
  * A bulging bucket of options for `transformSource`.
+ *
+ * The `source` string is intentionally excluded: it belongs in
+ * {@link SourceMapHookDetails} and is only available inside
+ * `transformSource()` when invoking `sourceMapHook`, not when constructing
+ * the options/state bag.
  */
-export interface TransformSourceParams
-  extends GeneratorOptions,
-    SourceMapHookDetails {
-  sourceType: ParserOptions['sourceType'];
+export interface TransformSourceParams extends GeneratorOptions {
+  sourceType?: ParserOptions['sourceType'] | undefined;
+  sourceUrl?: string | undefined;
+  sourceMapUrl?: string | undefined;
   fixedExportMap: Record<string, any>;
   imports: Record<string, any>;
   exportAlls: string[];
@@ -75,14 +80,15 @@ export interface TransformSourceParams
   importDecls: string[];
   dynamicImport: { present: boolean };
   importMeta: { present: boolean };
-  sourceMapHook?: SourceMapHook;
+  sourceMapHook?: SourceMapHook | undefined;
+  allowHidden?: boolean | undefined;
 
   /**
    * This is either a string or a SourceMapV3 object, but it's used with an
    * undocumented option (`inputSourceMap` of `@babel/generator`), so might not
    * do anything at all.
    */
-  sourceMap?: unknown;
+  sourceMap?: unknown | undefined;
 }
 
 /**
@@ -97,8 +103,8 @@ export type PluginFactory = (params: { types: typeof babelTypes }) => {
  * Options for the `ModuleSource` constructor.
  */
 export interface ModuleSourceOptions {
-  sourceUrl?: string;
-  sourceMap?: string;
-  sourceMapUrl?: string;
-  sourceMapHook?: SourceMapHook;
+  sourceUrl?: string | undefined;
+  sourceMap?: string | undefined;
+  sourceMapUrl?: string | undefined;
+  sourceMapHook?: SourceMapHook | undefined;
 }

@@ -219,8 +219,7 @@ function makeModulePlugins(options) {
               } else {
                 // Rewrite to be just name = value.
                 soften(id);
-                // @ts-expect-error - needs types
-                options.hoistedDecls.push([name]);
+                options.hoistedDecls.push([name, false, undefined]);
                 replacements.push(
                   t.expressionStatement(
                     t.assignmentExpression(
@@ -280,7 +279,6 @@ function makeModulePlugins(options) {
 
       const visitor = {
         Identifier(path) {
-          // @ts-expect-error - needs types
           if (options.allowHidden || allowedHiddens.has(path.node)) {
             return;
           }
