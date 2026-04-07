@@ -34,6 +34,19 @@ export interface SourceMapHookDetails {
 }
 
 /**
+ * A SourceMapV3 object.
+ */
+export type SourceMapObject = {
+  version: number;
+  sources: string[];
+  names: string[];
+  sourceRoot?: string | undefined;
+  sourcesContent?: string[] | undefined;
+  mappings: string;
+  file: string;
+};
+
+/**
  * A source map hook.
  *
  * **Do not confuse with `SourceMapHook` type from `@endo/compartment-mapper`.**
@@ -78,19 +91,6 @@ export interface TransformSourceParams
  */
 export type PluginFactory = (params: { types: typeof babelTypes }) => {
   visitor: Visitor;
-};
-
-/**
- * A SourceMapV3 object.
- */
-export type SourceMapObject = {
-  version: number;
-  sources: string[];
-  names: string[];
-  sourceRoot?: string | undefined;
-  sourcesContent?: string[] | undefined;
-  mappings: string;
-  file: string;
 };
 
 /**
