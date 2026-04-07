@@ -30,7 +30,7 @@ const textEncoder = new TextEncoder();
  * @param {MessagePort} port The worker's `parentPort`.
  * @param {WorkerPipelineConfig} config Pipeline configuration with visitor
  *   factories.
- * @returns {{removePipelineListener: () => void}} An object with a `stop` method to stop listening for messages.
+ * @returns {{removePipelineListener: () => void}} An object with a `removePipelineListener` method to stop listening for messages.
  */
 export function runPipelineInWorker(
   port,
@@ -59,6 +59,12 @@ export function runPipelineInWorker(
         allowReturnOutsideFunction: true,
         errorRecovery: true,
       });
+
+      if (ast.errors?.length) {
+        throw ast.errors[0] instanceof Error
+          ? ast.errors[0]
+          : new SyntaxError(ast.errors.map(error => String(error)).join('\n'));
+      }
 
       const analyzerPasses = createAnalyzerPasses(location, specifier);
       const {
@@ -108,7 +114,7 @@ export function runPipelineInWorker(
         analyzerResults,
       };
 
-      port.postMessage(result);
+      port.postMessage(result, [resultBytes.buffer]);
     } catch (err) {
       /** @type {WorkerErrorMessage} */
       const errMsg = {

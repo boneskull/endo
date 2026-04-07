@@ -153,8 +153,8 @@ const makeSyncExtensionParser = (
   }
 
   /** @type {ParseFn} */
-  const syncParser = (bytes, specifier, location, packageLocation, options) =>
-    syncTrampoline(
+  const syncParser = (bytes, specifier, location, packageLocation, options) => {
+    const result = syncTrampoline(
       getParserGenerator,
       bytes,
       specifier,
@@ -162,6 +162,13 @@ const makeSyncExtensionParser = (
       packageLocation,
       options,
     );
+    if ('then' in result && typeof result.then === 'function') {
+      throw new TypeError(
+        'Sync parser cannot return a Thenable; ensure parser is actually synchronous',
+      );
+    }
+    return result;
+  };
   syncParser.isSyncParser = true;
   return syncParser;
 };

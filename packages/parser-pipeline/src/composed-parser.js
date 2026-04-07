@@ -40,29 +40,6 @@ const noop = () => {};
  * 6. Calls `onModuleComplete` with collected analyzer results
  * 7. Returns a `ParseFn`-compatible result
  *
- *
- * @param {RecordBuilder} recordBuilder - Builds the module record from
- *   generated code. Required because `ParseFn` must return a `record`.
- * @param {ComposedParserOptions} options
- * @returns {ParserImplementation} An object with a `parse` method compatible with
- *   compartment-mapper's `parserForLanguage` entries.
- */
-
-/**
- * Creates a `parserForLanguage`-compatible parser that composes multiple Babel
- * visitor passes into a single parse-traverse-generate cycle.
- *
- * The returned object has a `parse` method matching compartment-mapper's
- * `ParseFn` signature. For each module source:
- *
- * 1. Parses the source once via `@babel/parser`
- * 2. Instantiates fresh analyzer and transform visitors via factories
- * 3. Traverses the AST with each analyzer visitor (read-only, in order)
- * 4. Traverses the AST with each transform visitor (mutating, in order)
- * 5. Generates code once via `@babel/generator`
- * 6. Calls `onModuleComplete` with collected analyzer results
- * 7. Returns a `ParseFn`-compatible result
- *
  * @template {readonly any[]} TAnalyzerResults
  * @overload
  * @param {RecordBuilder} recordBuilder - Builds the module record from

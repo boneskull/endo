@@ -134,7 +134,15 @@ export class WorkerParserPool {
       }
       this.#log('Worker pool is dispatching task', message);
       this.#pending.set(id, { worker, resolve, reject });
-      worker.postMessage(message);
+      try {
+        worker.postMessage(message);
+      } catch (error) {
+        this.#pending.delete(id);
+        this.#available.delete(worker);
+        this.#all.delete(worker);
+        worker.terminate().catch(() => {});
+        reject(error);
+      }
     });
   }
 

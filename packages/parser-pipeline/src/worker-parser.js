@@ -27,7 +27,7 @@ import { WorkerParserPool } from './worker-pool.js';
  *
  * @param {string | URL} workerScript Path to the consumer-provided worker
  *   entry point. The worker script should call `runPipelineInWorker` from
- *   `@endo/parser-pipeline/worker`.
+ *   `@endo/parser-pipeline/worker-runner.js`.
  * @param {WorkerParserOptions} [options]
  * @returns {TerminatableAsyncParserImplementation}
  */

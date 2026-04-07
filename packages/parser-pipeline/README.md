@@ -69,7 +69,7 @@ const parser = createComposedParser(recordBuilder, {
 // parser satisfies ParserImplementation with synchronous: true
 ```
 
-The `recordBuilder` is a required first argument. It is a synchronous function whichreceives the generated code and module location. It must return a `FinalStaticModuleType` (e.g., a SES `ModuleSource`-compatible record).
+The `recordBuilder` is a required first argument. It is a synchronous function which receives the generated code and module location. It must return a `FinalStaticModuleType` (e.g., a SES `ModuleSource`-compatible record).
 
 #### Visitor Ordering
 
@@ -120,7 +120,7 @@ Worker scripts import their own visitor modules and call `runPipelineInWorker` f
 
 ```javascript
 // my-worker.js
-import { runWorkerPipeline } from '@endo/parser-pipeline/worker-runner.js';
+import { runPipelineInWorker } from '@endo/parser-pipeline/worker-runner.js';
 import { createEvasiveTransformPass } from '@endo/evasive-transform';
 import { createModuleSourcePasses } from '@endo/module-source';
 import { isMainThread, parentPort, workerData } from 'node:worker_threads';
@@ -129,9 +129,9 @@ if (!parentPort || isMainThread) {
   throw new Error('This module must be run as a worker thread');
 }
 
-// runWorkerPipeline registers a listener for messages on parentPort;
+// runPipelineInWorker registers a listener for messages on parentPort;
 // removePipelineListener removes it, if needed.
-const { removePipelineListener } = runWorkerPipeline(parentPort, {
+const { removePipelineListener } = runPipelineInWorker(parentPort, {
   createAnalyzerPasses: (location, specifier) => [
     // your read-only analysis visitors
   ],
